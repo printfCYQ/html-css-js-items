@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>翻转时钟</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .flip-clock {
+        display: flex;
+      }
+
+      .flip-card {
+        width: 60px;
+        height: 100px;
+        font-size: 66px;
+        text-align: center;
+        line-height: 100px;
+        border-radius: 10px;
+        border: 1px solid black;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+        position: relative;
+        margin: 1px;
+      }
+
+      .digital::after,
+      .digital::before {
+        content: attr(data-number);
+        position: absolute;
+        left: 0;
+        right: 0;
+        color: white;
+        background-color: black;
+        overflow: hidden;
+        perspective: 180px;
+      }
+
+      .digital::before {
+        top: 0;
+        bottom: 50%;
+        border-radius: 10px 10px 0 0;
+        border-bottom: 1px solid #666;
+      }
+
+      .digital::after {
+        top: 50%;
+        bottom: 0;
+        line-height: 0;
+        border-radius: 0 0 10px 10px;
+      }
+
+      .digital.front::after,
+      .digital.back::before {
+        z-index: 1;
+      }
+
+      .digital.back::after {
+        z-index: 2;
+        transform-origin: top center;
+        transform: rotateX(0.5turn);
+      }
+
+      .digital.front::before {
+        z-index: 3;
+      }
+
+      @keyframes frontFlipDown {
+        to {
+          transform: rotateX(0.5turn);
+        }
+      }
+
+      @keyframes backFlipDown {
+        to {
+          transform: rotateX(0);
+        }
+      }
+
+      .flip-card.running .front::before {
+        transform-origin: center bottom;
+        animation: frontFlipDown 0.6s ease-in-out;
+        backface-visibility: hidden;
+      }
+
+      .flip-card.flip-card.running .back::after {
+        animation: backFlipDown 0.6s ease-in-out;
+      }
+
+      .divider {
+        font-size: 66px;
+        margin: 0 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="flip-clock" class="flip-clock"></div>
+    <script>
+      class FlipCard {
+        constructor(currentNumber = 1, nextNumber = 2) {
+          this.duration = 500;
+          this.isRunning = false;
+          this.createRootNode();
+          this.createNodes();
+          this.setFrontNumber(currentNumber);
+          this.setBackNumber(nextNumber);
+        }
+
+        createRootNode() {
+          this.root = document.createElement("div");
+          this.root.classList.add("flip-card");
+        }
+
+        createNodes() {
+          this.frontNode = document.createElement("div");
+          this.frontNode.classList.add("digital", "front");
+          this.bankNode = document.createElement("div");
+          this.bankNode.classList.add("digital", "back");
+          this.root.append(this.frontNode, this.bankNode);
+        }
+        setFrontNumber(number) {
+          this.frontNode.dataset.number = number;
+        }
+        setBackNumber(number) {
+          this.bankNode.dataset.number = number;
+        }
+        flipDown(currentNumber, nextNumber) {
+          if (this.isRunning) {
+            return;
+          }
+          this.isRunning = true;
+          this.root.classList.add("running");
+          this.setFrontNumber(currentNumber);
+          this.setBackNumber(nextNumber);
+          setTimeout(() => {
+            this.root.classList.remove("running");
+            this.setFrontNumber(nextNumber);
+            this.isRunning = false;
+          }, this.duration);
+        }
+      }
+
+      class FlipClock {
+        constructor(id) {
+          this.root = document.querySelector(`#${id}`);
+          this.init();
+        }
+
+        getTimeFromDate(date) {
+          return date.toTimeString().slice(0, 8).split(":").join("");
+        }
+        refreshTime() {
+          const now = new Date(new Date().getTime() - 1000);
+          this.nowTimeStr = this.getTimeFromDate(
+            new Date(now.getTime() - 1000)
+          );
+          this.nextTimeStr = this.getTimeFromDate(now);
+        }
+        init() {
+          this.refreshTime();
+          this.flipCards = this.buildFilpCards();
+          this.initFlipping();
+        }
+        initFlipping() {
+          this.interval = setInterval(() => {
+            this.refreshTime();
+            this.flipCards.forEach((item, index) => {
+              if (this.nextTimeStr[index] === this.nowTimeStr[index]) {
+                return;
+              }
+              item.flipDown(this.nowTimeStr[index], this.nextTimeStr[index]);
+            });
+          }, 1000);
+        }
+        buildFilpCards() {
+          let flipCards = [];
+          for (let i = 0; i < 6; i++) {
+            const flipCard = new FlipCard(
+              this.nowTimeStr[i],
+              this.nextTimeStr[i]
+            );
+            this.root.append(flipCard.root);
+            if (i === 1 || i === 3) {
+              const divider = document.createElement("div");
+              divider.classList.add("divider");
+              divider.textContent = ":";
+              this.root.append(divider);
+            }
+            flipCards.push(flipCard);
+          }
+          return flipCards;
+        }
+      }
+
+      new FlipClock("flip-clock");
+    </script>
+  </body>
+</html>
