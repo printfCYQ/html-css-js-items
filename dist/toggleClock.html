@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        transform: color 0.5s, background-color 0.5s;
+      }
+
+      :root {
+        --main-color: #fff;
+        --clock-circle-color: #000;
+        --scale-color: #777;
+        --primary-hand-color: #ff9410;
+        --secondary-hand-color: #000;
+        --icon-color: rgb(41, 41, 41);
+        --icon-background-color: rgb(222, 222, 222);
+      }
+
+      body.dark {
+        --main-color: #091921;
+        --clock-circle-color: #fff;
+        --scale-color: #777;
+        --primary-hand-color: #ff105e;
+        --secondary-hand-color: #fff;
+        --icon-color: rgb(255, 255, 255);
+        --icon-background-color: #aaa;
+      }
+
+      body {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--main-color);
+      }
+
+      .clock {
+        width: 350px;
+        height: 350px;
+        border-radius: 50%;
+        border: 4px solid var(--main-color);
+        box-shadow: 0 -15px 15px rgba(255, 255, 255, 0.05),
+          inset 0 15px 15px rgba(0, 0, 0, 0.3),
+          inset 0 -15px 15px rgba(255, 255, 255, 0.05),
+          0 15px 15px rgba(0, 0, 0, 0.3);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .clock::before {
+        content: "";
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: var(--clock-circle-color);
+        z-index: 100;
+      }
+
+      .clock .face {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .clock .face .scale {
+        width: 300px;
+        height: 300px;
+        position: absolute;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        font-size: 30px;
+        font-weight: bold;
+        line-height: 30px;
+        color: var(--scale-color);
+      }
+
+      .clock .face .scale::before {
+        content: "";
+        width: 4px;
+        height: 20px;
+        border-radius: 6px;
+        background-color: var(--scale-color);
+      }
+
+      .clock .face .scale:nth-child(3n)::before {
+        content: none;
+      }
+
+      .clock .hour,
+      .clock .minute,
+      .clock .second {
+        position: absolute;
+        display: flex;
+        justify-content: center;
+      }
+
+      .clock .hour {
+        width: 160px;
+        height: 160px;
+      }
+
+      .clock .hour::before {
+        content: "";
+        width: 8px;
+        height: 80px;
+        background-color: var(--primary-hand-color);
+        border-radius: 6px 6px 0 0;
+      }
+
+      .clock .minute {
+        width: 190px;
+        height: 190px;
+      }
+
+      .clock .minute::before {
+        content: "";
+        width: 4px;
+        height: 95px;
+        background-color: var(--secondary-hand-color);
+        border-radius: 6px 6px 0 0;
+      }
+
+      .clock .second {
+        width: 230px;
+        height: 230px;
+      }
+
+      .clock .second::before {
+        content: "";
+        width: 2px;
+        height: 115px;
+        background-color: var(--secondary-hand-color);
+        border-radius: 6px 6px 0 0;
+      }
+
+      .icon {
+        padding: 5px;
+        margin-bottom: 20px;
+        border-radius: 20%;
+        cursor: pointer;
+        fill: var(--icon-color);
+      }
+
+      .icon:hover {
+        background-color: var(--icon-background-color);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="light-icon">
+      <svg
+        class="icon"
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="m6.76 4.84l-1.8-1.79l-1.41 1.41l1.79 1.79zM1 10.5h3v2H1zM11 .55h2V3.5h-2zm8.04 2.495l1.408 1.407l-1.79 1.79l-1.407-1.408zm-1.8 15.115l1.79 1.8l1.41-1.41l-1.8-1.79zM20 10.5h3v2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6s6-2.69 6-6s-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4s4 1.79 4 4s-1.79 4-4 4zm-1 4h2v2.95h-2zm-7.45-.96l1.41 1.41l1.79-1.8l-1.41-1.41z"
+        />
+      </svg>
+    </div>
+
+    <div class="dark-icon">
+      <svg
+        class="icon"
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M9.37 5.51A7.35 7.35 0 0 0 9.1 7.5c0 4.08 3.32 7.4 7.4 7.4c.68 0 1.35-.09 1.99-.27A7.014 7.014 0 0 1 12 19c-3.86 0-7-3.14-7-7c0-2.93 1.81-5.45 4.37-6.49zM12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26a5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"
+        />
+      </svg>
+    </div>
+    <div id="clock" class="clock"></div>
+    <script>
+      const clockElement = document.querySelector("#clock");
+      const darkIcon = document.querySelector(".dark-icon");
+      const lightIcon = document.querySelector(".light-icon");
+
+      const hourElement = document.createElement("div");
+      const minuteElement = document.createElement("div");
+      const secondElement = document.createElement("div");
+
+      hourElement.classList.add("hour");
+      minuteElement.classList.add("minute");
+      secondElement.classList.add("second");
+
+      function initThemeSchema() {
+        const darkMode = window.matchMedia("(prefers-color-scheme: dark)");
+        if (darkMode && darkMode.matches) {
+          document.body.classList.add("dark");
+          darkIcon.style.display = "none";
+          lightIcon.style.display = "block";
+          console.log(lightIcon.style);
+        } else {
+          darkIcon.style.display = "block";
+          lightIcon.style.display = "none";
+        }
+      }
+      darkIcon.addEventListener("click", () => {
+        document.body.classList.add("dark");
+        darkIcon.style.display = "none";
+        lightIcon.style.display = "block";
+      });
+
+      lightIcon.addEventListener("click", () => {
+        document.body.classList.remove("dark");
+        darkIcon.style.display = "block";
+        lightIcon.style.display = "none";
+      });
+
+      function drawClockFace() {
+        const clockFaceElement = document.createElement("div");
+        clockFaceElement.classList.add("face");
+        for (let i = 1; i <= 12; i++) {
+          const scaleElement = document.createElement("div");
+          scaleElement.classList.add("scale");
+          scaleElement.style.transform = `rotate(${i * 30}deg)`;
+          clockFaceElement.append(scaleElement);
+          if (i % 3 === 0) {
+            const quaterElement = document.createElement("div");
+            quaterElement.textContent = i;
+            quaterElement.style.height = "30px";
+            quaterElement.style.transform = `rotate(-${(i / 3) * 90}deg)`;
+            scaleElement.appendChild(quaterElement);
+          }
+        }
+        clockElement.append(clockFaceElement);
+      }
+
+      function renderClockHand() {
+        const date = new Date();
+        const hour = date.getHours() % 12;
+        const minute = date.getMinutes();
+        const second = date.getSeconds() - 1;
+        hourElement.style.transform = `rotate(${hour * 30 + minute * 0.5}deg)`;
+        minuteElement.style.transform = `rotate(${
+          minute * 6 + second * 0.1
+        }deg)`;
+        secondElement.style.transform = `rotate(${second * 6}deg)`;
+      }
+
+      drawClockFace();
+      initThemeSchema();
+      clockElement.append(hourElement, minuteElement, secondElement);
+
+      setInterval(renderClockHand);
+    </script>
+  </body>
+</html>
