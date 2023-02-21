@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>audioWave</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background-color: rgb(44, 44, 44);
+      }
+      canvas {
+        border-bottom: 1px saddlebrown solid;
+      }
+      audio {
+        width: 100vw;
+        margin-top: 25vh;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas></canvas>
+    <!-- http://120.48.74.178:7001/public/uploads/2023/01/02/huaxin.mp3 -->
+    <audio src="./static/fxyh.mp3" controls></audio>
+    <script>
+      const audioEle = document.querySelector("audio");
+      const cvs = document.querySelector("canvas");
+      const ctx = cvs.getContext("2d");
+
+      function initCvs() {
+        cvs.width = window.innerWidth;
+        cvs.height = window.innerHeight / 2;
+      }
+
+      initCvs();
+
+      let isInit = false; // 全局仅需初始化一次
+      let dataArray, analyser;
+      audioEle.onplay = function () {
+        if (isInit) return;
+        isInit = true;
+
+        const audioCtx = new AudioContext(); // 创建音频上下文
+        const source = audioCtx.createMediaElementSource(audioEle); // 创建音频源节点
+
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 512; // 2 的 n 方
+
+        // 创建数组，用于接收分析器节点的分析数据
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+      };
+
+      function draw() {
+        requestAnimationFrame(draw);
+
+        const { width, height } = cvs;
+        ctx.clearRect(0, 0, width, height); // 清空画布
+        if (!isInit) {
+          return;
+        }
+
+        // 让分析器节点分析出数据到数组中
+        analyser.getByteFrequencyData(dataArray);
+        const len = dataArray.length / 2.5;
+        const barWidth = width / len / 2;
+        ctx.fillStyle = "#78C5F7";
+        for (let i = 0; i < len; i++) {
+          const data = dataArray[i]; // < 256
+          const barHeight = (data / 255) * height;
+          const x1 = i * barWidth + width / 2;
+          const x2 = width / 2 - (i - 1) * barWidth;
+          const y = height - barHeight;
+          ctx.fillRect(x1, y, barWidth - 2, barHeight);
+          ctx.fillRect(x2, y, barWidth - 2, barHeight);
+        }
+      }
+      draw();
+    </script>
+  </body>
+</html>
