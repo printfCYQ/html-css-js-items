@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>scrollMusic</title>
+    <script src="./static/qsx.song.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      body {
+        background: #000;
+        color: #666;
+        text-align: center;
+      }
+      audio {
+        width: 450px;
+        margin: 30px 0;
+      }
+      .container {
+        height: 420px;
+        overflow: hidden;
+      }
+      .container ul {
+        /* border: 2px solid #fff; */
+        transition: 0.2s;
+      }
+      .container li {
+        height: 30px;
+        line-height: 30px;
+        transition: 0.3s;
+      }
+      .container li.active {
+        color: #fff;
+        transform: scale(1.2);
+      }
+    </style>
+  </head>
+  <body>
+    <audio src="./static/qsx.mp3" controls></audio>
+    <div class="container">
+      <ul class="lrc-list"></ul>
+    </div>
+    <script>
+      var doms = {
+        container: document.querySelector(".container"),
+        audio: document.querySelector("audio"),
+        ul: document.querySelector(".container ul"),
+      };
+      console.log(song);
+      /**
+       * 格式化时间字符串为时间，时间单位为秒
+       * @param {String} timeString 时间字符串，格式为： mm:ss.SSS, 如： 00:01.404
+       * @returns {Number}
+       */
+      const formatTimeToNumber = (timeString) => {
+        let time = 0;
+        if (timeString) {
+          const splitArr = timeString.split(":").map((item) => Number(item));
+          return splitArr[0] * 60 + splitArr[1];
+        }
+        return time;
+      };
+
+      /**
+       * 格式化歌词字符串为"时间-歌词"格式的数组
+       * @param {String}  歌词字符串
+       * @returns {Array} [{time:时间, text:歌词}]
+       */
+      const formatLyric = (lyric) => {
+        const lyricParts = lyric.split("\n").filter((item) => item);
+        return lyricParts.map((item) => {
+          const splitItems = item.split("]");
+          const lyricItem = {
+            time: formatTimeToNumber(splitItems[0].slice(1)),
+            text: splitItems[1],
+          };
+          return lyricItem;
+        });
+      };
+      var lrcData = formatLyric(song.lrc.lyric);
+      console.log(lrcData);
+
+      /**
+       * 高亮索引
+       */
+      const findIndex = () => {
+        var curTime = doms.audio.currentTime; //当前播放时间
+        for (let i = 0; i < lrcData.length; i++) {
+          if (lrcData[i].time > curTime) {
+            return i - 1;
+          }
+        }
+        // 最后一句
+        return lrcData.length - 1;
+      };
+
+      // 创建歌词元素
+      const createLrcElements = () => {
+        let frag = document.createDocumentFragment(); // dom片段 不会频繁更改DOM
+        for (let i = 0; i < lrcData.length; i++) {
+          var li = document.createElement("li");
+          li.textContent = lrcData[i].text;
+          frag.appendChild(li);
+        }
+        doms.ul.appendChild(frag);
+      };
+      createLrcElements();
+
+      var containerHeight = doms.container.clientHeight;
+      var liHeight = doms.ul.children[0].clientHeight;
+      var maxOffset = doms.ul.clientHeight - containerHeight; //最大偏移量
+
+      // 设置ul偏移量
+      const setOffset = () => {
+        var index = findIndex();
+        var offset = liHeight * index + liHeight / 2 - containerHeight / 2;
+        if (offset < 0) offset = 0;
+        if (offset > maxOffset) offset = maxOffset;
+        doms.ul.style.transform = `translateY(-${offset}px)`;
+
+        var li = doms.ul.querySelector(".active");
+        li && li.classList.remove("active");
+        li = doms.ul.children[index];
+        li && li.classList.add("active");
+      };
+
+      doms.audio.addEventListener("timeupdate", setOffset);
+    </script>
+  </body>
+</html>
