@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>模拟文件上传</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        display: flex;
+        height: 100vh;
+        align-items: center;
+        justify-content: center;
+      }
+      .upload {
+        width: 200px;
+        height: 200px;
+        border-radius: 4px;
+        border: 1px slategray dashed;
+        position: relative;
+      }
+      .upload-select {
+        display: flex;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        color: slategray;
+        cursor: pointer;
+        user-select: none;
+      }
+      .upload-select input {
+        width: 0;
+        height: 0;
+      }
+
+      .upload-progress {
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 10;
+        color: aliceblue;
+      }
+      .upload-progress::after {
+        content: "";
+        background-color: rgba(105, 105, 105, 0.362);
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1;
+      }
+      .upload-progress .progress-bar {
+        width: 90%;
+        height: 10px;
+        border-radius: 10px;
+        background-color: #fff;
+        margin: 5px auto;
+      }
+      .upload-progress .progress-bar::after {
+        content: "";
+        width: calc(var(--percent) * 1%);
+        height: 10px;
+        border-radius: 10px;
+        background-color: aqua;
+        display: block;
+      }
+      .upload-progress button {
+        border: none;
+        background-color: transparent;
+        color: rgb(225, 231, 231);
+        cursor: pointer;
+      }
+
+      .upload-progress button:hover {
+        transform: scale(1.1);
+        color: rgb(240, 244, 244);
+        transition: all 0.1s;
+      }
+      .upload-result button {
+        position: absolute;
+        top: 0;
+        right: 0;
+        border: none;
+        background-color: transparent;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        background-color: orangered;
+        cursor: pointer;
+      }
+
+      .preview {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -2;
+        width: 100%;
+        height: 100%;
+        object-fit: fill;
+      }
+
+      .upload.select .upload-progress,
+      .upload.select .upload-result,
+      .upload.progress .upload-select,
+      .upload.progress .upload-result,
+      .upload.result .upload-select,
+      .upload.result .upload-progress,
+      .upload.select .preview {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="upload select">
+      <div class="upload-select">
+        +
+        <input type="file" />
+      </div>
+      <div class="upload-progress" style="--percent: 0">
+        <p>进度:<span class="progress-num">0</span>%</p>
+        <div class="progress-bar"></div>
+        <button>取消</button>
+      </div>
+      <div class="upload-result">
+        <button>X</button>
+      </div>
+      <img class="preview" src="" alt="" />
+    </div>
+    <script>
+      const $ = document.querySelector.bind(document);
+      const doms = {
+        img: $(".preview"),
+        container: $(".upload"),
+        select: $(".upload-select"),
+        selectFile: $(".select input"),
+        progress: $(".upload-progress"),
+        progressNum: $(".upload-progress .progress-num"),
+        cancelBtn: $(".upload-progress button"),
+        delBtn: $(".upload-result button"),
+      };
+      let cancelUpload = null;
+
+      // 切换显示内容
+      function showArea(areaName) {
+        doms.container.className = `upload ${areaName}`;
+      }
+
+      // 设置进度
+      function setProgress(progress) {
+        doms.progress.style.setProperty("--percent", progress);
+        doms.progressNum.textContent = progress;
+      }
+
+      // 选择文件
+      doms.select.onclick = function () {
+        doms.selectFile.click();
+      };
+
+      // 监听文件
+      doms.selectFile.onchange = function () {
+        if (this.files.length === 0) return;
+        const file = this.files[0];
+        if (!validateFile(file)) {
+          return false;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          doms.img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+
+        showArea("progress");
+
+        cancelUpload = upload(
+          file,
+          function (val) {
+            setProgress(val);
+          },
+          function () {
+            showArea("result");
+          }
+        );
+      };
+
+      // 模拟上传
+      function upload(file, onProgress, onFinish) {
+        let p = 0;
+        onProgress(p);
+        const timer = setInterval(() => {
+          p++;
+          onProgress(p);
+          if (p === 100) {
+            onFinish();
+            clearInterval(timer);
+          }
+        }, 50);
+        return function () {
+          clearInterval(timer);
+        };
+      }
+
+      // 文件校验
+      function validateFile(file) {
+        const maxSize = 1 * 1024 * 1024;
+        const legalExts = ["jpg", "png", "gif"];
+        if (file.size > maxSize) {
+          alert("文件过大");
+          return false;
+        }
+        const name = getExtension(file.name).toLowerCase();
+        if (!legalExts.includes(name)) {
+          alert("类型不对");
+          return false;
+        }
+        return true;
+      }
+
+      // 取消按钮，X按钮
+      doms.cancelBtn.onclick = doms.delBtn.onclick = cancel;
+
+      function cancel() {
+        cancelUpload && cancelUpload();
+        showArea("select");
+        doms.selectFile.value = null;
+      }
+
+      // 获取 .后缀名
+      function getExtension(name) {
+        return name.substring(name.lastIndexOf(".") + 1);
+      }
+    </script>
+  </body>
+</html>
