@@ -46,12 +46,42 @@
           this.r = 6;
           this.x = getRandom(0, cvs.width - this.r / 2);
           this.y = getRandom(0, cvs.height - this.r / 2);
+          this.xSpeed = getRandom(-50, 50);
+          this.ySpeed = getRandom(-50, 50);
+          this.lastDrawTime = null;
         }
         draw() {
+          // 更新坐标
+          if (this.lastDrawTime) {
+            // 计算新坐标
+            const duration = (Date.now() - this.lastDrawTime) / 1000;
+            const xDis = this.xSpeed * duration;
+            const yDis = this.ySpeed * duration;
+            let x = this.x + xDis;
+            let y = this.y + yDis;
+            // 边界
+            if (x > cvs.width - this.r / 2) {
+              x = cvs.width - this.r / 2;
+              this.xSpeed = -this.xSpeed;
+            } else if (x < 0) {
+              x = 0;
+              this.xSpeed = -this.xSpeed;
+            }
+            if (y > cvs.height - this.r / 2) {
+              y = cvs.height - this.r / 2;
+              this.ySpeed = -this.ySpeed;
+            } else if (y < 0) {
+              y = 0;
+              this.ySpeed = -this.ySpeed;
+            }
+            this.x = x;
+            this.y = y;
+          }
           ctx.beginPath();
           ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
           ctx.fillStyle = "rgb(200,200,200)";
           ctx.fill();
+          this.lastDrawTime = Date.now();
         }
       }
 
@@ -59,12 +89,16 @@
       class Graph {
         // pointNumber 点的个数
         // maxDis 相邻点最大距离
-        constructor(pointNumber = 30, maxDis = 300) {
+        constructor(pointNumber = 100, maxDis = 200) {
           this.points = new Array(pointNumber).fill(0).map(() => new Point()); // 创建点
           this.maxDis = maxDis;
         }
         // 画线
         draw() {
+          requestAnimationFrame(() => {
+            this.draw();
+          });
+          ctx.clearRect(0, 0, cvs.width, cvs.height);
           for (let i = 0; i < this.points.length; i++) {
             const p1 = this.points[i];
             p1.draw();
