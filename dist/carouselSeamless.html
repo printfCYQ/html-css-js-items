@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>无缝轮播图</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 500px;
+        height: 300px;
+        margin: 10px auto;
+        overflow: hidden;
+        position: relative;
+      }
+      .container .carousel {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        transition: all 0.5s;
+      }
+      .container .carousel img {
+        width: 500px;
+        height: 300px;
+      }
+
+      .container .arrow-left,
+      .container .arrow-right {
+        width: 20px;
+        height: 20px;
+        color: #fff;
+        text-align: center;
+        line-height: 20px;
+        background-color: #ccc;
+        padding: 3px;
+        border-radius: 50%;
+        position: absolute;
+        transform: translateY(-50%);
+        top: 50%;
+        cursor: pointer;
+      }
+      .container .arrow-left {
+        left: 0;
+      }
+      .container .arrow-right {
+        right: 0;
+      }
+      .container .indicator {
+        position: absolute;
+        bottom: 10px;
+        display: flex;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .container .indicator span {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid #ccc;
+        margin: 0 3px;
+        cursor: pointer;
+      }
+      .container .indicator span.active {
+        background-color: #fff;
+        border-color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="carousel">
+        <div class="item">
+          <a href="javascript:void(0)">
+            <img src="./shoppingCart/assets/g1.png" alt="" />
+          </a>
+        </div>
+        <div class="item">
+          <a href="javascript:void(0)">
+            <img src="./shoppingCart/assets/g2.png" alt="" />
+          </a>
+        </div>
+        <div class="item">
+          <a href="javascript:void(0)">
+            <img src="./shoppingCart/assets/g3.png" alt="" />
+          </a>
+        </div>
+        <div class="item">
+          <a href="javascript:void(0)">
+            <img src="./shoppingCart/assets/g4.png" alt="" />
+          </a>
+        </div>
+      </div>
+      <div class="arrow-left">&lt;</div>
+      <div class="arrow-right">&gt;</div>
+      <div class="indicator">
+        <span class="active"></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+    <script>
+      var doms = {
+        carousel: document.querySelector(".carousel"),
+        arrowLeft: document.querySelector(".arrow-left"),
+        arrowRight: document.querySelector(".arrow-right"),
+        indicator: document.querySelector(".indicator"),
+        indicators: document.querySelectorAll(".indicator span"),
+      };
+      let index = 0;
+      let timer;
+      const count = doms.indicators.length;
+
+      function init() {
+        var first = doms.carousel.firstElementChild.cloneNode(true); // 复制第一张图片
+        var last = doms.carousel.lastElementChild.cloneNode(true); // 复制最后一张图片
+        doms.carousel.appendChild(first); // 将第一张图放到末尾
+        doms.carousel.insertBefore(last, doms.carousel.firstElementChild); //将最后一张图放到开头
+        last.style.position = "absolute"; // 设置最后一张（开头）为绝对定位
+        last.style.transform = "translateX(-100%)";
+      }
+      init();
+
+      function autoMove() {
+        timer = setInterval(() => {
+          // 无缝
+          if (index === count - 1) {
+            doms.carousel.style.transform = "translateX(100%)";
+            doms.carousel.style.transition = "none";
+            doms.carousel.clientHeight; // 强制渲染
+            moveTo(0);
+          } else {
+            moveTo(index + 1);
+          }
+        }, 1000);
+      }
+      autoMove();
+
+      function moveTo(i) {
+        doms.carousel.style.transform = `translateX(-${i}00%)`;
+        doms.carousel.style.transition = "all .5s";
+        var active = document.querySelector(".indicator .active");
+        active.classList.remove("active");
+        doms.indicators[i].classList.add("active");
+        index = i;
+      }
+      doms.indicators.forEach(function (item, i) {
+        item.onclick = function () {
+          moveTo(i);
+        };
+      });
+
+      function leftNext() {
+        // 无缝
+        if (index === 0) {
+          doms.carousel.style.transform = `translateX(-${count}00%)`;
+          doms.carousel.style.transition = "none";
+          doms.carousel.clientHeight; // 强制渲染
+          moveTo(count - 1);
+        } else {
+          moveTo(index - 1);
+        }
+        clearInterval(timer);
+        autoMove();
+      }
+      function rightNext() {
+        // 无缝
+        if (index === count - 1) {
+          doms.carousel.style.transform = "translateX(100%)";
+          doms.carousel.style.transition = "none";
+          doms.carousel.clientHeight; // 强制渲染
+          moveTo(0);
+        } else {
+          moveTo(index + 1);
+        }
+        clearInterval(timer);
+        autoMove();
+      }
+
+      doms.arrowLeft.onclick = leftNext;
+      doms.arrowRight.onclick = rightNext;
+    </script>
+  </body>
+</html>
