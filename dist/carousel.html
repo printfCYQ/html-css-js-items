@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>轮播图</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 500px;
+        height: 300px;
+        margin: 10px auto;
+        overflow: hidden;
+        position: relative;
+      }
+      .container .carousel {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        transition: all 0.5s;
+      }
+      .container .carousel img {
+        width: 500px;
+        height: 300px;
+      }
+      .container .indicator {
+        position: absolute;
+        bottom: 10px;
+        display: flex;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .container .indicator span {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid #ccc;
+        margin: 0 3px;
+        cursor: pointer;
+      }
+      .container .indicator span.active {
+        background-color: #fff;
+        border-color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="carousel">
+        <div class="item">
+          <a href="javascript:void(0)">
+            <img src="./shoppingCart/assets/g1.png" alt="" />
+          </a>
+        </div>
+        <div class="item">
+          <a href="javascript:void(0)">
+            <img src="./shoppingCart/assets/g2.png" alt="" />
+          </a>
+        </div>
+        <div class="item">
+          <a href="javascript:void(0)">
+            <img src="./shoppingCart/assets/g3.png" alt="" />
+          </a>
+        </div>
+        <div class="item">
+          <a href="javascript:void(0)">
+            <img src="./shoppingCart/assets/g4.png" alt="" />
+          </a>
+        </div>
+      </div>
+      <div class="arrow-left">&lt;</div>
+      <div class="arrow-right">&gt;</div>
+      <div class="indicator">
+        <span class="active"></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+    <script>
+      var doms = {
+        carousel: document.querySelector(".carousel"),
+        arrowLeft: document.querySelector(".arrow-left"),
+        arrowRight: document.querySelector(".arrow-right"),
+        indicator: document.querySelector(".indicator"),
+        indicators: document.querySelectorAll(".indicator span"),
+      };
+      let index = 0;
+      let timer;
+      function autoMove() {
+        timer = setInterval(() => {
+          if (index === doms.indicators.length) index = 0;
+          moveTo(index);
+          index++;
+        }, 1000);
+      }
+      autoMove();
+
+      function moveTo(index) {
+        doms.carousel.style.transform = `translateX(-${index}00%)`;
+        var active = document.querySelector(".indicator .active");
+        active.classList.remove("active");
+        doms.indicators[index].classList.add("active");
+      }
+      doms.indicators.forEach(function (item, i) {
+        item.onclick = function () {
+          moveTo(i);
+          index = i;
+        };
+      });
+    </script>
+  </body>
+</html>
