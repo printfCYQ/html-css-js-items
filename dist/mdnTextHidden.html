@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      :root {
+        --background-primary: #fff;
+        --base-line-height: 1.5;
+        --type-smaller-font-size: 0.833rem;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        width: 100vw;
+        height: 100vh;
+        padding: 2rem;
+        box-sizing: border-box;
+      }
+
+      .mdn {
+        width: 500px;
+        border: 1px solid #000;
+        border-radius: 8px;
+        padding: 1rem;
+      }
+      .mdn p {
+        margin-top: 1rem;
+        font: var(--type-smaller-font-size);
+        line-height: var(--base-line-height);
+        margin: 0;
+        max-height: calc(3em * var(--base-line-height));
+        overflow: hidden;
+        position: relative;
+      }
+
+      .mdn p::after {
+        background: var(--background-primary);
+        content: "";
+        display: block;
+        height: calc(1em * var(--base-line-height));
+        -webkit-mask-image: linear-gradient(90deg, transparent, #000 75%);
+        mask-image: linear-gradient(90deg, transparent, #000 75%);
+        pointer-events: none;
+        position: absolute;
+        right: 0;
+        top: calc(2em * var(--base-line-height));
+        width: 20ch;
+      }
+
+      .open {
+        width: 500px;
+        border: 1px solid #000;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+      }
+
+      .open p {
+        margin-top: 1rem;
+        font: var(--type-smaller-font-size);
+        line-height: var(--base-line-height);
+        margin: 0;
+        max-height: calc(3em * var(--base-line-height));
+        overflow: hidden;
+        position: relative;
+      }
+      .open p span {
+        background: var(--background-primary);
+        content: "";
+        display: block;
+        height: calc(1em * var(--base-line-height));
+        -webkit-mask-image: linear-gradient(90deg, transparent, #000 75%);
+        mask-image: linear-gradient(90deg, transparent, #000 75%);
+        position: absolute;
+        right: 0;
+        top: calc(2em * var(--base-line-height));
+        width: 20ch;
+        pointer-events: none;
+      }
+      .open p span::after {
+        content: "展开";
+        position: absolute;
+        right: 1rem;
+        color: #0c74cf;
+        cursor: pointer;
+        pointer-events: all;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mdn">
+      <h1>Web API 接口参考</h1>
+      <h2>初识 WebGL</h2>
+      <p>
+        WebGL 使得在支持 HTML 的 canvas
+        标签的浏览器中，不需要安装任何插件，便可以使用基于 OpenGL ES 2.0 的 API
+        在 canvas 中进行 2D 和 3D 渲染。WebGL 程序包括用 JavaScript
+        写的控制代码，以及在图形处理单元（GPU, Graphics Processing
+        Unit）中执行的着色代码（GLSL，注：GLSL 为 OpenGL 着色语言）。WebGL
+        元素可以和其他 HTML
+        元素混合使用，并且可以和网页其他部分或者网页背景结合起来。
+      </p>
+    </div>
+
+    <div class="open">
+      <h1>Web API 接口参考</h1>
+      <h2>初识 WebGL</h2>
+      <p>
+        WebGL 使得在支持 HTML 的 canvas
+        标签的浏览器中，不需要安装任何插件，便可以使用基于 OpenGL ES 2.0 的 API
+        在 canvas 中进行 2D 和 3D 渲染。WebGL 程序包括用 JavaScript
+        写的控制代码，以及在图形处理单元（GPU, Graphics Processing
+        Unit）中执行的着色代码（GLSL，注：GLSL 为 OpenGL 着色语言）。WebGL
+        元素可以和其他 HTML
+        元素混合使用，并且可以和网页其他部分或者网页背景结合起来。
+        <span></span>
+      </p>
+    </div>
+
+    <script>
+      const button = document.querySelector(".open p span");
+      button.addEventListener("click", () => {
+        console.log("被点击了");
+      });
+    </script>
+  </body>
+</html>
